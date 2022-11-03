@@ -21,7 +21,7 @@ import java.sql.Date;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private static final long EXPIRATION_TIME = 900_000;
+    private static final long EXPIRATION_TIME = 3_600_000;
     public static final String SECRET = "QVBJIFJFU1RmdWwgVXNpbmcgU3ByaW5nIEJvb3Q=";
 
     private final AuthenticationManager authentication;
