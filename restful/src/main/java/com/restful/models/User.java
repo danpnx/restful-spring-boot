@@ -1,24 +1,24 @@
 package com.restful.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "USERS")
 public class User implements UserDetails, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "USER_ID", columnDefinition = "BINARY(16)")
+    @Type(type = "org.hibernate.type.UUIDCharType")
+    @Column(name = "USER_ID", columnDefinition = "CHAR(36)", unique = true)
     private UUID id;
 
     @Column(name = "FIRST_NAME", nullable = false, length = 40)
@@ -33,11 +33,18 @@ public class User implements UserDetails, Serializable {
     @Column(name = "PASSWORD", nullable = false, length = 60)
     private String password;
 
+    @Column(name = "PRIVATE_ACCOUNT")
+    private boolean privateAccount;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnoreProperties("user")
+    private ArrayList<Post> posts = new ArrayList<>();
+
     public User() {
     }
 
-    public User(UUID id, String firstName, String lastName, String username, String password) {
-        this.id = id;
+    public User(String firstName, String lastName, String username, String password) {
+        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -84,6 +91,14 @@ public class User implements UserDetails, Serializable {
         this.password = password;
     }
 
+    public boolean isPrivateAccount() {
+        return privateAccount;
+    }
+
+    public void setPrivateAccount(boolean privateAccount) {
+        this.privateAccount = privateAccount;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -107,6 +122,10 @@ public class User implements UserDetails, Serializable {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
+    }
+
+    public UserInformation convertToUserInformation() {
+        return new UserInformation(this.firstName, this.lastName, this.posts);
     }
 
     @Override
