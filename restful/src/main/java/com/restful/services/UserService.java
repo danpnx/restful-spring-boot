@@ -1,9 +1,9 @@
 package com.restful.services;
 
 import com.restful.models.User;
+import com.restful.models.UserInformation;
 import com.restful.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,17 +33,46 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    // temporary
-    public List<User> findAll() {
-        if(userRepository.findAll().size() == 0) {
-            throw new EmptyResultDataAccessException("Any user found in database", 1);
-        }
-
-        return userRepository.findAll();
+    // Used to get the authenticated user information
+    public User getUserInfo(String username) {
+        return userRepository.findByUsername(username).get();
     }
 
-    private boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+    public UserInformation getUserByUsername(String username) {
+        if(!existsByUsername(username)) {
+            throw new UsernameNotFoundException("This account don't exist");
+        }
+
+        User u = userRepository.findByUsername(username).get();
+        if(u.isPrivateAccount()) {
+            // PrivateAccountException: Private account
+            throw new RuntimeException("Private account");
+        }
+        return u.convertToUserInformation();
+    }
+
+    public void updateAccountVisibility(boolean isPrivate, String username) {
+        User u = userRepository.findByUsername(username).get();
+        u.setPrivateAccount(isPrivate);
+        userRepository.save(u);
+    }
+
+    public void updatePassword(String newPassword, String username) {
+        User u = userRepository.findByUsername(username).get();
+        u.setPassword(encoder.encode(newPassword));
+        userRepository.save(u);
+    }
+
+    public void updateFirstName(String firstName, String username) {
+        User u = userRepository.findByUsername(username).get();
+        u.setFirstName(firstName);
+        userRepository.save(u);
+    }
+
+    public void updateLastName(String lastName, String username) {
+        User u = userRepository.findByUsername(username).get();
+        u.setLastName(lastName);
+        userRepository.save(u);
     }
 
     @Override
@@ -58,5 +86,9 @@ public class UserService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 opt.get().getUsername(), opt.get().getPassword(), opt.get().getAuthorities()
         );
+    }
+
+    private boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 }
