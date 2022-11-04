@@ -62,4 +62,12 @@ public class Post implements Serializable {
     public void setLikes(long likes) {
         this.likes = likes;
     }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
