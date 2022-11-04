@@ -38,7 +38,7 @@ public class User implements UserDetails, Serializable {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties("user")
-    private ArrayList<Post> posts = new ArrayList<>();
+    private List<Post> posts = new ArrayList<>();
 
     public User() {
     }
@@ -89,6 +89,10 @@ public class User implements UserDetails, Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
     }
 
     public boolean isPrivateAccount() {
