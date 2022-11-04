@@ -34,11 +34,11 @@ public class UserService implements UserDetailsService {
     }
 
     // Used to get the authenticated user information
-    public User getUserInfo(String username) {
+    public User getUser(String username) {
         return userRepository.findByUsername(username).get();
     }
 
-    public UserInformation getUserByUsername(String username) {
+    public UserInformation getUserInfo(String username) {
         if(!existsByUsername(username)) {
             throw new UsernameNotFoundException("This account don't exist");
         }
@@ -49,6 +49,11 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Private account");
         }
         return u.convertToUserInformation();
+    }
+
+    // Method used in PostService
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).get();
     }
 
     public void updateAccountVisibility(boolean isPrivate, String username) {
