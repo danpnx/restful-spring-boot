@@ -2,6 +2,7 @@ package com.restful.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Type;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "POSTS")
-public class Post implements Serializable {
+public class Post extends RepresentationModel<Post> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

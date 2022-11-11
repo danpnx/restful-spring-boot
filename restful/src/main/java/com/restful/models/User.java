@@ -2,6 +2,7 @@ package com.restful.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Type;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,7 +12,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "USERS")
-public class User implements UserDetails, Serializable {
+public class User extends RepresentationModel<User> implements UserDetails, Serializable {
 
     private static final long serialVersionUID = 1L;
 
