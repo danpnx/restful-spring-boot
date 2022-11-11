@@ -42,16 +42,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             return authentication.authenticate(authResult);
         }catch(IOException | AuthenticationException e) {
-            // AuthenticationException: Fail to authenticate
-            // IOException: "Bad credentials"
             throw new RuntimeException(e);
         }
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                            FilterChain chain, Authentication authResult)
-            throws IOException, ServletException {
+                                            FilterChain chain, Authentication authResult) {
 
         String username = ((UserDetails) authResult.getPrincipal()).getUsername();
 
