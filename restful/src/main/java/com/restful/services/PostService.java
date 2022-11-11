@@ -1,5 +1,6 @@
 package com.restful.services;
 
+import com.restful.controllers.PostController;
 import com.restful.models.Post;
 import com.restful.models.User;
 import com.restful.models.UserInformation;
@@ -11,6 +12,9 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 @Transactional
@@ -37,6 +41,14 @@ public class PostService {
             throw new EmptyResultDataAccessException(1);
         }
 
+        for(Post p: u.getPosts()) {
+            p.add(linkTo(methodOn(PostController.class).getPostById(p.getId().toString())).withSelfRel());
+            p.add(linkTo(methodOn(PostController.class).deletePost(p.getId().toString())).withSelfRel());
+            p.add(linkTo(methodOn(PostController.class).likePost(p.getId().toString())).withSelfRel());
+
+            postRepository.save(p);
+        }
+
         return u.getPosts();
     }
 
@@ -50,8 +62,11 @@ public class PostService {
         if(opt.get().getUser().isPrivateAccount()) {
             throw new RuntimeException("Private account");
         }
+        Post p = opt.get();
+        p.add(linkTo(methodOn(PostController.class).getUserPosts()).withRel("Publicações"));
+        postRepository.save(p);
 
-        return opt.get();
+        return p;
     }
 
     public void deletePost(UUID id, String username) {

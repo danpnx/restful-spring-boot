@@ -1,5 +1,6 @@
 package com.restful.services;
 
+import com.restful.controllers.UserController;
 import com.restful.models.User;
 import com.restful.models.UserInformation;
 import com.restful.repositories.UserRepository;
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 @Transactional
@@ -48,6 +52,13 @@ public class UserService implements UserDetailsService {
             // PrivateAccountException: Private account
             throw new RuntimeException("Private account");
         }
+
+        u.add(linkTo(methodOn(UserController.class).updateFirstName(null)).withSelfRel());
+        u.add(linkTo(methodOn(UserController.class).updateLastName(null)).withSelfRel());
+        u.add(linkTo(methodOn(UserController.class).updatePassword(null)).withSelfRel());
+        u.add(linkTo(methodOn(UserController.class).updateAccountVisibility(false)).withSelfRel());
+
+        userRepository.save(u);
         return u.convertToUserInformation();
     }
 
